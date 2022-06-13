@@ -157,21 +157,19 @@ public class ItemServlet extends CustomServlet {
 
         for (Map.Entry<String, JsonElement> entry:object.entrySet()){
             String key = entry.getKey();
-            if(key.equals("name")){
-
-                query.append("name='").append(entry.getValue().getAsString()).append("',");
-
-            }else if (key.equals("desc")){
-
-                query.append("description='").append(entry.getValue().getAsString()).append("',");
-            }
-            else if (key.equals("cost")){
-
-                query.append("costPrice=").append(entry.getValue().getAsString()).append(",");
-            }
-            else if (key.equals("sale")){
-
-                query.append("sellingPrice=").append(entry.getValue().getAsString()).append(" ");
+            switch (key) {
+                case "name":
+                    query.append("name='").append(entry.getValue().getAsString()).append("',");
+                    break;
+                case "desc":
+                    query.append("description='").append(entry.getValue().getAsString()).append("',");
+                    break;
+                case "cost":
+                    query.append("costPrice=").append(entry.getValue().getAsString()).append(",");
+                    break;
+                case "sale":
+                    query.append("sellingPrice=").append(entry.getValue().getAsString()).append(" ");
+                    break;
             }
 //            else if (key.equals("id")) {
 //                objId = entry.getValue().getAsInt();
