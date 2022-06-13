@@ -51,7 +51,7 @@ public class HelloServlet extends HttpServlet {
         JsonArray jsonArray = new JsonArray();
         try {
             st = conn.createStatement();
-            ResultSet rs =  st.executeQuery("select id,name,email from users;");
+            ResultSet rs =  st.executeQuery("");
 
             while (rs.next()){
                 int id = rs.getInt("id");

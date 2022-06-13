@@ -21,7 +21,7 @@ public class Database {
 
         try {
             initContext = new InitialContext();
-            ds = (DataSource)initContext.lookup("java:comp/env/jdbc/testdb1");
+            ds = (DataSource)initContext.lookup("java:comp/env/jdbc/DB");
             connection = ds.getConnection();
         } catch (NamingException | SQLException e) {
             throw new RuntimeException(e);
