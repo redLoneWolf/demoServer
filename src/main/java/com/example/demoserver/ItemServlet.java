@@ -185,6 +185,40 @@ public class ItemServlet extends CustomServlet {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+//        super.doDelete(req, resp);
+
+
+        if(req.getParameter("id")==null){
+            resp.setStatus(400);
+            return;
+        }
+
+        int objId = Integer.parseInt(req.getParameter("id"));
+
+        String query = "delete from items where id="+objId+" ;";
+        int affected = 0;
+        try {
+            Statement st = connection.createStatement();
+            affected = st.executeUpdate(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (affected==1){
+            resp.setStatus(204);
+            resp.getOutputStream().print("Deleted");
+            return;
+        }else{
+            resp.setStatus(400);
+            resp.getOutputStream().print("Not deleted");
+        }
+
+
 
 
     }
