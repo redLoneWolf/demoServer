@@ -1,9 +1,7 @@
-package com.example.demoserver;
+package com.example.demoserver.servlets;
 
-import com.example.demoserver.data.Organisation;
-import com.example.demoserver.data.OrganisationDao;
-import com.example.demoserver.data.Stock;
-import com.example.demoserver.data.StockDao;
+import com.example.demoserver.GsonHelper;
+import com.example.demoserver.data.*;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -15,8 +13,8 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 
-@WebServlet(name = "StockServlet",value ="/stocks")
-public class StockServlet extends CustomServlet{
+@WebServlet(name = "InvoiceServlet",value = "/invoices")
+public class InvoiceServlet extends CustomServlet{
 
     Gson gson;
     @Override
@@ -33,12 +31,12 @@ public class StockServlet extends CustomServlet{
         response.setHeader("Content-Type", "application/json");
         String json = "";
         if(request.getParameter("id")==null){
-            Type listType = new TypeToken<List<Stock>>() {}.getType();
+            Type listType = new TypeToken<List<Invoice>>() {}.getType();
 
-            json = gson.toJson(StockDao.getAll(),listType);
+            json = gson.toJson(InvoiceDao.getAll(),listType);
         }else{
             objId = Integer.parseInt(request.getParameter("id"));
-            json = gson.toJson(StockDao.get(objId));
+            json = gson.toJson(InvoiceDao.get(objId));
         }
         response.getOutputStream().print(json);
     }
@@ -48,13 +46,12 @@ public class StockServlet extends CustomServlet{
         String body =  Utils.getBody(request);
         response.setStatus(200);
         response.setHeader("Content-Type", "application/json");
-        Stock stock = gson.fromJson(body,Stock.class);
-        if(stock.getCount()==null){
+        Invoice invoice = gson.fromJson(body,Invoice.class);
+        if(invoice.getCustomerName()==null || invoice.getOrgId()==null){
             response.setStatus(400);
-
             return;
         }
-        if(StockDao.save(stock)==1){
+        if(InvoiceDao.save(invoice)==1){
             response.getOutputStream().print("Created Success Fully");
         }else {
             response.getOutputStream().print("Creation Failed");
@@ -69,7 +66,7 @@ public class StockServlet extends CustomServlet{
         }
         int objId = Integer.parseInt(req.getParameter("id"));
 
-        if (StockDao.delete(objId)==1){
+        if (InvoiceDao.delete(objId)==1){
             resp.setStatus(204);
             resp.getOutputStream().print("Deleted");
 
@@ -92,17 +89,16 @@ public class StockServlet extends CustomServlet{
             response.setStatus(400);
             return;
         }
-        Stock object =  gson.fromJson(body, Stock.class);
-        int  newCount ;
+        Invoice object =  gson.fromJson(body, Invoice.class);
         System.out.println();
 
-        if(object.getCount()==null){
+        if(object.getTax()==null&&object.getDiscount()==null){
             response.setStatus(400);
             return;
         }
 
-        newCount = object.getCount();
-        if(StockDao.update(objId,newCount)==1){
+
+        if(InvoiceDao.update(objId,object.getTax(),object.getDiscount())==1){
             response.getOutputStream().print("success");
         }else {
             response.getOutputStream().print("failed");

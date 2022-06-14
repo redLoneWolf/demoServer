@@ -1,9 +1,8 @@
-package com.example.demoserver;
+package com.example.demoserver.servlets;
 
-import com.example.demoserver.data.Order;
-import com.example.demoserver.data.OrderDao;
-import com.example.demoserver.data.Stock;
-import com.example.demoserver.data.StockDao;
+import com.example.demoserver.GsonHelper;
+import com.example.demoserver.data.Organisation;
+import com.example.demoserver.data.OrganisationDao;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -15,8 +14,8 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 
-@WebServlet(name = "OrderServlet",value = "/orders")
-public class OrderServlet extends CustomServlet{
+@WebServlet(name = "OrganisationServlet", value = "/organisations")
+public class OrganisationServlet extends CustomServlet {
 
 
     Gson gson;
@@ -34,12 +33,12 @@ public class OrderServlet extends CustomServlet{
         response.setHeader("Content-Type", "application/json");
         String json = "";
         if(request.getParameter("id")==null){
-            Type listType = new TypeToken<List<Order>>() {}.getType();
+            Type listType = new TypeToken<List<Organisation>>() {}.getType();
 
-            json = gson.toJson(OrderDao.getAll(),listType);
+            json = gson.toJson(OrganisationDao.getAll(),listType);
         }else{
             objId = Integer.parseInt(request.getParameter("id"));
-            json = gson.toJson(OrderDao.get(objId));
+            json = gson.toJson(OrganisationDao.get(objId));
         }
         response.getOutputStream().print(json);
     }
@@ -49,15 +48,8 @@ public class OrderServlet extends CustomServlet{
         String body =  Utils.getBody(request);
         response.setStatus(200);
         response.setHeader("Content-Type", "application/json");
-        Order order = gson.fromJson(body,Order.class);
-        if(order.getItemId()==null || order.getOrgId()==null || order.getInvoiceId()==null
-                || order.getCustomerName()==null|| order.getPrice()==null){
-
-            response.setStatus(400);
-
-            return;
-        }
-        if(OrderDao.save(order)==1){
+        Organisation organisation = gson.fromJson(body,Organisation.class);
+        if(OrganisationDao.save(organisation)==1){
             response.getOutputStream().print("Created Success Fully");
         }else {
             response.getOutputStream().print("Creation Failed");
@@ -65,25 +57,7 @@ public class OrderServlet extends CustomServlet{
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if(req.getParameter("id")==null){
-            resp.setStatus(400);
-            return;
-        }
-        int objId = Integer.parseInt(req.getParameter("id"));
-
-        if (OrderDao.delete(objId)==1){
-            resp.setStatus(204);
-            resp.getOutputStream().print("Deleted");
-
-        }else{
-            resp.setStatus(400);
-            resp.getOutputStream().print("Not deleted");
-        }
-    }
-
-    @Override
-    protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String body = Utils.getBody(request);
 
         int objId = 0;
@@ -95,19 +69,46 @@ public class OrderServlet extends CustomServlet{
             response.setStatus(400);
             return;
         }
-        Order object =  gson.fromJson(body, Order.class);
-        int  newPrice;
-        System.out.println();
 
-        if(object.getPrice()==null&&object.getQuantity()==null){
+        Organisation object =  gson.fromJson(body, Organisation.class);
+//        String name ;
+
+        String name ;
+
+
+        System.out.println();
+        if(object.getName()!=null){
+            name = object.getName();
+        }else {
             response.setStatus(400);
             return;
         }
 
-        if(OrderDao.update(objId,object.getPrice(),object.getQuantity())==1){
+        if(OrganisationDao.update(objId,name)==1){
             response.getOutputStream().print("success");
         }else {
             response.getOutputStream().print("failed");
         }
+
     }
+
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+        if(req.getParameter("id")==null){
+            resp.setStatus(400);
+            return;
+        }
+        int objId = Integer.parseInt(req.getParameter("id"));
+
+        if (OrganisationDao.delete(objId)==1){
+            resp.setStatus(204);
+            resp.getOutputStream().print("Deleted");
+            return;
+        }else{
+            resp.setStatus(400);
+            resp.getOutputStream().print("Not deleted");
+        }
+    }
+
 }

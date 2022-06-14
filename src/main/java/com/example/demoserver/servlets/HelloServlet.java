@@ -1,5 +1,7 @@
-package com.example.demoserver;
+package com.example.demoserver.servlets;
 
+import com.example.demoserver.Database;
+import com.example.demoserver.User;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

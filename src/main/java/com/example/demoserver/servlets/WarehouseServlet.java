@@ -1,29 +1,20 @@
-package com.example.demoserver;
+package com.example.demoserver.servlets;
 
-import com.example.demoserver.data.Item;
-import com.example.demoserver.data.ItemDao;
+import com.example.demoserver.GsonHelper;
+import com.example.demoserver.data.*;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-import javax.servlet.annotation.*;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
-@WebServlet(name = "ItemServlet", value = "/items")
-public class ItemServlet extends CustomServlet {
+@WebServlet(name = "WarehouseServlet",value = "/warehouses")
+public class WarehouseServlet extends CustomServlet{
 
     Gson gson;
     @Override
@@ -40,81 +31,77 @@ public class ItemServlet extends CustomServlet {
         response.setHeader("Content-Type", "application/json");
         String json = "";
         if(request.getParameter("id")==null){
-            Type listType = new TypeToken<List<Item>>() {}.getType();
+            Type listType = new TypeToken<List<Warehouse>>() {}.getType();
 
-            json = gson.toJson(ItemDao.getAll(),listType);
+            json = gson.toJson(WarehouseDao.getAll(),listType);
         }else{
             objId = Integer.parseInt(request.getParameter("id"));
-            json = gson.toJson(ItemDao.getItem(objId));
+            json = gson.toJson(WarehouseDao.get(objId));
         }
         response.getOutputStream().print(json);
     }
 
-
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-            String body =  Utils.getBody(request);
-            response.setStatus(200);
-            response.setHeader("Content-Type", "application/json");
-            Item item = gson.fromJson(body,Item.class);
-            if(ItemDao.save(item)==1){
-                response.getOutputStream().print("Created Success Fully");
-            }else {
-                response.getOutputStream().print("Creation Failed");
-            }
+        String body =  Utils.getBody(request);
+        response.setStatus(200);
+        response.setHeader("Content-Type", "application/json");
+        Warehouse war = gson.fromJson(body,Warehouse.class);
+        if(war.getOrgId()<1){
+
+            response.getOutputStream().print("Creation Failed");
+            return;
+        }
+        if(WarehouseDao.save(war)==1){
+            response.getOutputStream().print("Created Success Fully");
+        }else {
+            response.getOutputStream().print("Creation Failed");
+        }
     }
 
     @Override
-    public void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String body = Utils.getBody(request);
-
         int objId = 0;
         response.setStatus(200);
         response.setHeader("Content-Type", "application/json");
+
         if(request.getParameter("id")!=null){
             objId = Integer.parseInt(request.getParameter("id"));
         }else {
             response.setStatus(400);
             return;
         }
-
-        JsonObject object =  gson.fromJson(body,JsonObject.class);
-
-//        response.getOutputStream().print(object.toString());
-//        "name","desc","cost","sale"
-
-//        if(!object.entrySet().contains("id")){
-//            response.setStatus(400);
-//
-//            return;
-//        }
-        if(ItemDao.update(objId,object.entrySet())==1){
+        Warehouse object =  gson.fromJson(body, Warehouse.class);
+        String name ;
+        if(object.getName()!=null){
+            name = object.getName();
+        }else {
+            response.setStatus(400);
+            return;
+        }
+        if(WarehouseDao.update(objId,name)==1){
             response.getOutputStream().print("success");
         }else {
             response.getOutputStream().print("failed");
         }
-
-
     }
-
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-//        super.doDelete(req, resp);
         if(req.getParameter("id")==null){
             resp.setStatus(400);
             return;
         }
         int objId = Integer.parseInt(req.getParameter("id"));
 
-        if (ItemDao.delete(objId)==1){
+        if (WarehouseDao.delete(objId)==1){
             resp.setStatus(204);
             resp.getOutputStream().print("Deleted");
-            return;
         }else{
             resp.setStatus(400);
             resp.getOutputStream().print("Not deleted");
         }
     }
+
 }

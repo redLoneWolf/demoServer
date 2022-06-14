@@ -1,8 +1,9 @@
-package com.example.demoserver;
+package com.example.demoserver.servlets;
 
-import com.example.demoserver.data.*;
+import com.example.demoserver.GsonHelper;
+import com.example.demoserver.data.Order;
+import com.example.demoserver.data.OrderDao;
 import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
 import javax.servlet.ServletException;
@@ -13,8 +14,9 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 
-@WebServlet(name = "InvoiceServlet",value = "/invoices")
-public class InvoiceServlet extends CustomServlet{
+@WebServlet(name = "OrderServlet",value = "/orders")
+public class OrderServlet extends CustomServlet{
+
 
     Gson gson;
     @Override
@@ -31,12 +33,12 @@ public class InvoiceServlet extends CustomServlet{
         response.setHeader("Content-Type", "application/json");
         String json = "";
         if(request.getParameter("id")==null){
-            Type listType = new TypeToken<List<Invoice>>() {}.getType();
+            Type listType = new TypeToken<List<Order>>() {}.getType();
 
-            json = gson.toJson(InvoiceDao.getAll(),listType);
+            json = gson.toJson(OrderDao.getAll(),listType);
         }else{
             objId = Integer.parseInt(request.getParameter("id"));
-            json = gson.toJson(InvoiceDao.get(objId));
+            json = gson.toJson(OrderDao.get(objId));
         }
         response.getOutputStream().print(json);
     }
@@ -46,12 +48,15 @@ public class InvoiceServlet extends CustomServlet{
         String body =  Utils.getBody(request);
         response.setStatus(200);
         response.setHeader("Content-Type", "application/json");
-        Invoice invoice = gson.fromJson(body,Invoice.class);
-        if(invoice.getCustomerName()==null || invoice.getOrgId()==null){
+        Order order = gson.fromJson(body,Order.class);
+        if(order.getItemId()==null || order.getOrgId()==null || order.getInvoiceId()==null
+                || order.getCustomerName()==null|| order.getPrice()==null){
+
             response.setStatus(400);
+
             return;
         }
-        if(InvoiceDao.save(invoice)==1){
+        if(OrderDao.save(order)==1){
             response.getOutputStream().print("Created Success Fully");
         }else {
             response.getOutputStream().print("Creation Failed");
@@ -66,7 +71,7 @@ public class InvoiceServlet extends CustomServlet{
         }
         int objId = Integer.parseInt(req.getParameter("id"));
 
-        if (InvoiceDao.delete(objId)==1){
+        if (OrderDao.delete(objId)==1){
             resp.setStatus(204);
             resp.getOutputStream().print("Deleted");
 
@@ -89,16 +94,16 @@ public class InvoiceServlet extends CustomServlet{
             response.setStatus(400);
             return;
         }
-        Invoice object =  gson.fromJson(body, Invoice.class);
+        Order object =  gson.fromJson(body, Order.class);
+        int  newPrice;
         System.out.println();
 
-        if(object.getTax()==null&&object.getDiscount()==null){
+        if(object.getPrice()==null&&object.getQuantity()==null){
             response.setStatus(400);
             return;
         }
 
-
-        if(InvoiceDao.update(objId,object.getTax(),object.getDiscount())==1){
+        if(OrderDao.update(objId,object.getPrice(),object.getQuantity())==1){
             response.getOutputStream().print("success");
         }else {
             response.getOutputStream().print("failed");
