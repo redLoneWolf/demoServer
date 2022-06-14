@@ -2,28 +2,24 @@ package com.example.demoserver;
 
 import com.example.demoserver.data.Item;
 import com.example.demoserver.data.ItemDao;
+import com.example.demoserver.data.Organisation;
+import com.example.demoserver.data.OrganisationDao;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-import javax.servlet.annotation.*;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
-@WebServlet(name = "ItemServlet", value = "/items")
-public class ItemServlet extends CustomServlet {
+@WebServlet(name = "OrganisationServlet", value = "/organisations")
+public class OrganisationServlet extends CustomServlet {
+
 
     Gson gson;
     @Override
@@ -40,29 +36,27 @@ public class ItemServlet extends CustomServlet {
         response.setHeader("Content-Type", "application/json");
         String json = "";
         if(request.getParameter("id")==null){
-            Type listType = new TypeToken<List<Item>>() {}.getType();
+            Type listType = new TypeToken<List<Organisation>>() {}.getType();
 
-            json = gson.toJson(ItemDao.getAll(),listType);
+            json = gson.toJson(OrganisationDao.getAll(),listType);
         }else{
             objId = Integer.parseInt(request.getParameter("id"));
-            json = gson.toJson(ItemDao.getItem(objId));
+            json = gson.toJson(OrganisationDao.get(objId));
         }
         response.getOutputStream().print(json);
     }
 
-
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-            String body =  Utils.getBody(request);
-            response.setStatus(200);
-            response.setHeader("Content-Type", "application/json");
-            Item item = gson.fromJson(body,Item.class);
-            if(ItemDao.save(item)==1){
-                response.getOutputStream().print("Created Success Fully");
-            }else {
-                response.getOutputStream().print("Creation Failed");
-            }
+        String body =  Utils.getBody(request);
+        response.setStatus(200);
+        response.setHeader("Content-Type", "application/json");
+        Organisation organisation = gson.fromJson(body,Organisation.class);
+        if(OrganisationDao.save(organisation)==1){
+            response.getOutputStream().print("Created Success Fully");
+        }else {
+            response.getOutputStream().print("Creation Failed");
+        }
     }
 
     @Override
@@ -79,36 +73,38 @@ public class ItemServlet extends CustomServlet {
             return;
         }
 
-        JsonObject object =  gson.fromJson(body,JsonObject.class);
+        Organisation object =  gson.fromJson(body, Organisation.class);
+//        String name ;
 
-//        response.getOutputStream().print(object.toString());
-//        "name","desc","cost","sale"
+        String name ;
 
-//        if(!object.entrySet().contains("id")){
-//            response.setStatus(400);
-//
-//            return;
-//        }
-        if(ItemDao.update(objId,object.entrySet())==1){
+
+        System.out.println();
+        if(object.getName()!=null){
+            name = object.getName();
+        }else {
+            response.setStatus(400);
+            return;
+        }
+
+        if(OrganisationDao.update(objId,name)==1){
             response.getOutputStream().print("success");
         }else {
             response.getOutputStream().print("failed");
         }
-
 
     }
 
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-//        super.doDelete(req, resp);
         if(req.getParameter("id")==null){
             resp.setStatus(400);
             return;
         }
         int objId = Integer.parseInt(req.getParameter("id"));
 
-        if (ItemDao.delete(objId)==1){
+        if (OrganisationDao.delete(objId)==1){
             resp.setStatus(204);
             resp.getOutputStream().print("Deleted");
             return;
@@ -117,4 +113,5 @@ public class ItemServlet extends CustomServlet {
             resp.getOutputStream().print("Not deleted");
         }
     }
+
 }

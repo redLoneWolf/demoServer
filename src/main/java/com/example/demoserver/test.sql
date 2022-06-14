@@ -46,6 +46,8 @@ create table orders(id int not null auto_increment primary key ,
                     itemId int not null ,
                     orgId int not null ,
                     price int not null ,
+                    discount float default 0.0,
+                    tax float default  0.0,
                     createdAt timestamp not null default CURRENT_TIMESTAMP,
                     constraint organ_fk
                         foreign key (orgId)

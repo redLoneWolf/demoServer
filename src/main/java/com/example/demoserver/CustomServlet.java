@@ -15,5 +15,5 @@ public abstract class CustomServlet extends HttpServlet {
         }
     }
 
-    public abstract void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException;
+    protected abstract void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException;
 }

@@ -12,7 +12,7 @@ public class Database {
 
     public static Connection getConnection() {
         if(connection!=null){
-            return null;
+            return connection;
         }
 
         DataSource ds;
