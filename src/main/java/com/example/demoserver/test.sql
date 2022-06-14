@@ -32,6 +32,8 @@ create table items(id int not null auto_increment primary key,
 create table invoices(id int not null auto_increment primary key,
                       cName varchar(255) not null check ( cName!='' ),
                       orgId int not null ,
+                      discount float not null default 0.0,
+                      tax float not null default 0.0,
                       createdAt timestamp not null default CURRENT_TIMESTAMP,
                       constraint org_fk
                           foreign key (orgId)
@@ -46,8 +48,7 @@ create table orders(id int not null auto_increment primary key ,
                     itemId int not null ,
                     orgId int not null ,
                     price int not null ,
-                    discount float default 0.0,
-                    tax float default  0.0,
+                    quantity int not null default 1,
                     createdAt timestamp not null default CURRENT_TIMESTAMP,
                     constraint organ_fk
                         foreign key (orgId)
@@ -108,3 +109,21 @@ insert into warehouseStocks(warId, itemId, count) values (5,16,200);
 insert into warehouseStocks(warId, itemId, count) values (5,17,200);
 insert into warehouseStocks(warId, itemId, count) values (5,18,200);
 insert into warehouseStocks(warId, itemId, count) values (5,19,200);
+
+insert into invoices( cName, orgId, discount, tax ) values ('sudhar',1,5.1,4.1);
+insert into invoices( cName, orgId, discount, tax ) values ('sudhar',3,5.2,4.2);
+insert into invoices( cName, orgId, discount, tax ) values ('sudhar',1,5.3,4.3);
+insert into invoices( cName, orgId, discount, tax ) values ('sudhar',3,5.4,4.4);
+insert into invoices( cName, orgId, discount, tax ) values ('sudhar',1,5.5,4.5);
+
+insert into orders( invoiceId, cName, itemId, orgId,quantity, price ) values (1,'sudhar',15,1,5,500);
+insert into orders( invoiceId, cName, itemId, orgId,quantity, price ) values (1,'sudhar',16,1,3,15);
+insert into orders( invoiceId, cName, itemId, orgId,quantity, price ) values (1,'sudhar',17,1,4,7);
+insert into orders( invoiceId, cName, itemId, orgId,quantity, price ) values (1,'sudhar',18,1,2,5);
+insert into orders( invoiceId, cName, itemId, orgId,quantity, price ) values (1,'sudhar',19,1,1,20);
+
+
+
+
+
+

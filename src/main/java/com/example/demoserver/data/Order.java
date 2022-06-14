@@ -8,24 +8,27 @@ public class Order {
     int id;
 
     @SerializedName("invoiceId")
-    int invoiceId;
+    Integer invoiceId;
 
     @SerializedName("cname")
     String customerName;
 
     @SerializedName("itemId")
-    int itemId;
+    Integer itemId;
 
     @SerializedName("orgId")
-    int orgId;
+    Integer orgId;
 
     @SerializedName("price")
-    int price;
+    Integer price;
+
+    @SerializedName("quantity")
+    Integer quantity;
 
     @SerializedName("createdAt")
     String createdAt;
 
-    public Order(int id, int invoiceId, String customerName, int itemId, int orgId, int price, String createdAt) {
+    public Order(int id, int invoiceId, String customerName, int itemId, int orgId, int price,Integer quantity, String createdAt) {
         this.id = id;
         this.invoiceId = invoiceId;
         this.customerName = customerName;
@@ -33,6 +36,7 @@ public class Order {
         this.orgId = orgId;
         this.price = price;
         this.createdAt = createdAt;
+        this.quantity=quantity;
     }
 
     public Order() {
@@ -46,11 +50,11 @@ public class Order {
         this.id = id;
     }
 
-    public int getInvoiceId() {
+    public Integer getInvoiceId() {
         return invoiceId;
     }
 
-    public void setInvoiceId(int invoiceId) {
+    public void setInvoiceId(Integer invoiceId) {
         this.invoiceId = invoiceId;
     }
 
@@ -62,28 +66,36 @@ public class Order {
         this.customerName = customerName;
     }
 
-    public int getItemId() {
+    public Integer getItemId() {
         return itemId;
     }
 
-    public void setItemId(int itemId) {
+    public void setItemId(Integer itemId) {
         this.itemId = itemId;
     }
 
-    public int getOrgId() {
+    public Integer getOrgId() {
         return orgId;
     }
 
-    public void setOrgId(int orgId) {
+    public void setOrgId(Integer orgId) {
         this.orgId = orgId;
     }
 
-    public int getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(Integer price) {
         this.price = price;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     public String getCreatedAt() {

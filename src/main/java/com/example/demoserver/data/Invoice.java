@@ -7,27 +7,27 @@ import java.util.List;
 public class Invoice {
 
     @SerializedName("id")
-    int id;
+    private int id;
 
     @SerializedName("cname")
-    String customerName;
+    private String customerName;
 
     @SerializedName("orgId")
-    int orgId;
+    private Integer orgId;
 
     @SerializedName("createdAt")
-    String createdAt;
+    private String createdAt;
 
     @SerializedName("orders")
-    List<Order> orders;
+    private List<Order> orders;
 
     @SerializedName("discount")
-    float discount;
+    private Float discount;
 
     @SerializedName("tax")
-    float tax;
+    private Float tax;
 
-    float totalPrice=0;
+    private Float totalPrice= (float) 0;
 
 
     public Invoice(int id, String customerName, int orgId, String createdAt, List<Order> orders, float discount, float tax) {
@@ -43,7 +43,7 @@ public class Invoice {
     public Invoice() {
     }
 
-    public float getTotalPrice() {
+    public Float getTotalPrice() {
         for (Order order:orders) {
             totalPrice = totalPrice + order.getPrice();
         }
@@ -60,19 +60,19 @@ public class Invoice {
         return totalPrice-(totalPrice*discount)/100;
     }
 
-    public float getDiscount() {
+    public Float getDiscount() {
         return discount;
     }
 
-    public void setDiscount(float discount) {
+    public void setDiscount(Float discount) {
         this.discount = discount;
     }
 
-    public float getTax() {
+    public Float getTax() {
         return tax;
     }
 
-    public void setTax(float tax) {
+    public void setTax(Float tax) {
         this.tax = tax;
     }
 
@@ -92,11 +92,11 @@ public class Invoice {
         this.customerName = customerName;
     }
 
-    public int getOrgId() {
+    public Integer getOrgId() {
         return orgId;
     }
 
-    public void setOrgId(int orgId) {
+    public void setOrgId(Integer orgId) {
         this.orgId = orgId;
     }
 
