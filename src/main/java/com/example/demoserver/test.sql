@@ -69,7 +69,7 @@ create table orders(id int not null auto_increment primary key ,
 create table warehouseStocks(id int not null auto_increment primary key,
         warId int not null,
         itemId int not null,
-        count int default 0,
+        count int not null default 0,
 
          constraint war_fk
              foreign key (warId)
@@ -96,15 +96,15 @@ insert into items(orgId, name, description,  costPrice, sellingPrice) values (1,
 insert into items(orgId, name, description,  costPrice, sellingPrice) values (1,'eraser','eraser from apsara',3,5);
 insert into items(orgId, name, description,  costPrice, sellingPrice) values (1,'ruler','ruler from FC',15,20);
 
-insert into warehouseStocks(warId, itemId, count) values (1,1,100);
-insert into warehouseStocks(warId, itemId, count) values (1,2,100);
-insert into warehouseStocks(warId, itemId, count) values (1,3,100);
-insert into warehouseStocks(warId, itemId, count) values (1,4,100);
-insert into warehouseStocks(warId, itemId, count) values (1,5,100);
+insert into warehouseStocks(warId, itemId, count) values (1,15,100);
+insert into warehouseStocks(warId, itemId, count) values (1,16,100);
+insert into warehouseStocks(warId, itemId, count) values (1,17,100);
+insert into warehouseStocks(warId, itemId, count) values (1,18,100);
+insert into warehouseStocks(warId, itemId, count) values (1,19,100);
 
 
-insert into warehouseStocks(warId, itemId, count) values (2,1,200);
-insert into warehouseStocks(warId, itemId, count) values (2,2,200);
-insert into warehouseStocks(warId, itemId, count) values (2,3,200);
-insert into warehouseStocks(warId, itemId, count) values (2,4,200);
-insert into warehouseStocks(warId, itemId, count) values (2,5,200);
+insert into warehouseStocks(warId, itemId, count) values (5,15,200);
+insert into warehouseStocks(warId, itemId, count) values (5,16,200);
+insert into warehouseStocks(warId, itemId, count) values (5,17,200);
+insert into warehouseStocks(warId, itemId, count) values (5,18,200);
+insert into warehouseStocks(warId, itemId, count) values (5,19,200);

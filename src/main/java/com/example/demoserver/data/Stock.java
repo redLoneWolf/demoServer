@@ -2,7 +2,7 @@ package com.example.demoserver.data;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Stocks {
+public class Stock {
 
     @SerializedName("id")
     int id;
@@ -14,16 +14,16 @@ public class Stocks {
     int itemId;
 
     @SerializedName("count")
-    int count;
+    Integer count;
 
-    public Stocks(int id, int warId, int itemId, int count) {
+    public Stock(int id, int warId, int itemId, int count) {
         this.id = id;
         this.warId = warId;
         this.itemId = itemId;
         this.count = count;
     }
 
-    public Stocks() {
+    public Stock() {
     }
 
     public int getId() {
@@ -50,11 +50,11 @@ public class Stocks {
         this.itemId = itemId;
     }
 
-    public int getCount() {
+    public Integer getCount() {
         return count;
     }
 
-    public void setCount(int count) {
+    public void  setCount(Integer count) {
         this.count = count;
     }
 }
