@@ -2,27 +2,54 @@ package com.example.demoserver.data;
 
 import com.example.demoserver.Database;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class InvoiceDao {
-    static public int save(Invoice invoice) {
+    static public Invoice save(Invoice invoice) {
         Connection connection= Database.getConnection();
         int status = 0;
+        Invoice out = null;
 
         String query = "insert into invoices(cName, orgId, discount, tax ) values " +
                 "('"+ invoice.getCustomerName()+"',"+invoice.getOrgId()+","+invoice.getDiscount()+"," +invoice.getTax()+");";
         try {
-            Statement st = connection.createStatement();
-            status = st.executeUpdate(query);
+            PreparedStatement pstmt = connection.prepareStatement(query);
+            status = pstmt.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+            if(status==1){
+                ResultSet keys = pstmt.getGeneratedKeys();
+                keys.next();
+                out =  get(keys.getInt(1));
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return status;
+        return out;
+    }
+
+    static public Invoice saveWithOrders(Invoice invoice){
+        Invoice out = save(invoice);
+        Float totalPrice = 0.0f;
+        List<Order> outOrders = new ArrayList<>();
+        for (Order order: invoice.getOrders()){
+
+            order.setInvoiceId(out.getId());
+            order.setCustomerName(out.getCustomerName());
+            order.setOrgId(out.getOrgId());
+
+
+            Order toSave = OrderDao.save(order);
+            totalPrice = totalPrice +toSave.getAmount();
+            outOrders.add(toSave);
+
+            int old = StockDao.getWithWarIdAndItemId(toSave.getWarId(),toSave.getItemId()).getCount();
+
+            StockDao.updateWithWarIdAndItemId(toSave.getWarId(),toSave.getItemId(),old-toSave.getQuantity());
+        }
+        out.setTotalPrice(totalPrice);
+        out.setOrders(outOrders);
+        return out;
     }
 
     static public List<Invoice> getAll(){
@@ -41,6 +68,8 @@ public class InvoiceDao {
                 invoice.setDiscount(set.getFloat("discount"));
                 invoice.setTax(set.getFloat("tax"));
                 invoice.setCreatedAt(set.getTimestamp("createdAt").toString());
+                invoice.setTotalPrice((float) OrderDao.getAllWithInvoiceId(invoice.getId()).stream().mapToInt(Order::getAmount).reduce(0, Integer::sum));
+
                 invoices.add(invoice);
             }
         } catch (SQLException e) {
@@ -110,8 +139,10 @@ public class InvoiceDao {
 
     public static Invoice getWithOrders(int id){
         Invoice invoice = get(id);
+        List<Order> orders = OrderDao.getAllWithInvoiceId(id);
+         invoice.setOrders(orders);
 
-
+        invoice.setTotalPrice((float) orders.stream().mapToInt(Order::getAmount).reduce(0, Integer::sum));
 
         return invoice;
     }

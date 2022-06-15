@@ -1,28 +1,25 @@
 package com.example.demoserver.data;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
 
 public class Item{
 
     int id;
-
-
     String name;
-
-
     String description;
-
-
     int costPrice;
-
-
     int sellingPrice;
-
-
     int orgId;
-
-
     String createdAt;
+
+    int totalStock;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    List<Stock>stocks;
 
     public Item() {
     }
@@ -35,6 +32,23 @@ public class Item{
         this.sellingPrice = sellingPrice;
         this.orgId = orgId;
         this.createdAt = createdAt;
+    }
+
+
+    public List<Stock> getStocks() {
+        return stocks;
+    }
+
+    public void setStocks(List<Stock> stocks) {
+        this.stocks = stocks;
+    }
+
+    public int getTotalStock() {
+        return totalStock;
+    }
+
+    public void setTotalStock(int totalStock) {
+        this.totalStock = totalStock;
     }
 
     public int getId() {

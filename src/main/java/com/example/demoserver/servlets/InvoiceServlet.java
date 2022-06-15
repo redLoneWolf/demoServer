@@ -28,15 +28,19 @@ public class InvoiceServlet extends CustomServlet{
         response.setStatus(200);
         response.setHeader("Content-Type", "application/json");
         String json = "";
-        if(request.getParameter("id")==null){
+        try{
+            if(request.getParameter("id")==null){
 
-
-            json = objectMapper.writeValueAsString(InvoiceDao.getAll());
-        }else{
-            objId = Integer.parseInt(request.getParameter("id"));
-            json = objectMapper.writeValueAsString(InvoiceDao.get(objId));
+                json = objectMapper.writeValueAsString(InvoiceDao.getAll());
+            }else{
+                objId = Integer.parseInt(request.getParameter("id"));
+                json = objectMapper.writeValueAsString(InvoiceDao.getWithOrders(objId));
+            }
+            response.getOutputStream().print(json);
+        }catch (NullPointerException e){
+            response.setStatus(404);
+            response.getOutputStream().print("{Item not found}");
         }
-        response.getOutputStream().print(json);
     }
 
     @Override
@@ -49,8 +53,9 @@ public class InvoiceServlet extends CustomServlet{
             response.setStatus(400);
             return;
         }
-        if(InvoiceDao.save(invoice)==1){
-            response.getOutputStream().print("Created Success Fully");
+        Invoice out = invoice.getOrders()==null?InvoiceDao.save(invoice):InvoiceDao.saveWithOrders(invoice);
+        if(out!=null){
+            response.getOutputStream().print(objectMapper.writeValueAsString(out));
         }else {
             response.getOutputStream().print("Creation Failed");
         }
@@ -97,7 +102,7 @@ public class InvoiceServlet extends CustomServlet{
 
 
         if(InvoiceDao.update(objId,object.getTax(),object.getDiscount())==1){
-            response.getOutputStream().print("success");
+            response.getOutputStream().print(objectMapper.writeValueAsString(InvoiceDao.get(objId)));
         }else {
             response.getOutputStream().print("failed");
         }

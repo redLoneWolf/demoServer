@@ -4,29 +4,32 @@ import com.example.demoserver.Database;
 import com.fasterxml.jackson.databind.JsonNode;
 
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
 
 public class ItemDao {
 
 
-   public static int save(Item item){
+   public static Item save(Item item){
        int status = 0;
+       Item out = null;
        Connection connection = Database.getConnection();
 
         try {
-            Statement st = connection.createStatement();
             String query = "insert into items(orgId, name, description,  costPrice, sellingPrice) values ("+ item.getOrgId()+",'" +
                     item.getName()+"','"+item.getDescription()+"',"+item.getCostPrice()+","+item.getSellingPrice()+");";
-            status =  st.executeUpdate(query);
+            PreparedStatement pstmt = connection.prepareStatement(query);
+            status = pstmt.executeUpdate(query,Statement.RETURN_GENERATED_KEYS);
+            if(status==1){
+                ResultSet keys = pstmt.getGeneratedKeys();
+                keys.next();
+                out =  getItem(keys.getInt(1));
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return status;
+        return out;
 
     };
 
@@ -46,6 +49,7 @@ public class ItemDao {
                 item.setCostPrice(rs.getInt("costPrice"));
                 item.setSellingPrice(rs.getInt("sellingPrice"));
                 item.setCreatedAt(rs.getTimestamp("createdAt").toString());
+                item.setTotalStock(StockDao.getWithItemId(item.getId()).stream().mapToInt(Stock::getCount).reduce(0, Integer::sum));
                 items.add(item);
             }
         } catch (SQLException e) {
@@ -134,5 +138,13 @@ public class ItemDao {
             throw new RuntimeException(e);
         }
         return status;
+    }
+
+    public static Item getWithStocks(int itemId){
+        Item item = getItem(itemId);
+        List<Stock>stocks = StockDao.getWithItemId(itemId);
+        item.setStocks(stocks);
+        item.setTotalStock(stocks.stream().mapToInt(Stock::getCount).reduce(0,Integer::sum));
+        return item;
     }
 }

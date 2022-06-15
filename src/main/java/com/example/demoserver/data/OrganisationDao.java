@@ -3,10 +3,7 @@ package com.example.demoserver.data;
 import com.example.demoserver.Database;
 
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,19 +11,26 @@ import java.util.Set;
 
 public class OrganisationDao {
 
-    static public int save(Organisation org) {
+    static public Organisation save(Organisation org) {
         Connection connection= Database.getConnection();
+        Organisation organisation = null;
         int status = 0;
 
         String query = "insert into organisations(name) values ('"+org.getName()+"');";
 
         try {
-            Statement st = connection.createStatement();
-            status = st.executeUpdate(query);
+            PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            status = pstmt.executeUpdate();
+            if(status==1){
+                ResultSet keys = pstmt.getGeneratedKeys();
+                keys.next();
+                organisation =  get(keys.getInt(1));
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return status;
+
+        return organisation;
     }
 
     static public List<Organisation> getAll(){

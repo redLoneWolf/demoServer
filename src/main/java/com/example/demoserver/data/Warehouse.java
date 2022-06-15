@@ -4,13 +4,8 @@ package com.example.demoserver.data;
 
 public class Warehouse {
 
-
     int id;
-
-
     String name;
-
-
     int orgId;
 
     public Warehouse(int id, String name, int orgId) {

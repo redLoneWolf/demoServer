@@ -1,8 +1,7 @@
 package com.example.demoserver.servlets;
 
 import com.example.demoserver.JacksonHelper;
-import com.example.demoserver.data.Order;
-import com.example.demoserver.data.OrderDao;
+import com.example.demoserver.data.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
@@ -30,15 +29,19 @@ public class OrderServlet extends CustomServlet{
         response.setStatus(200);
         response.setHeader("Content-Type", "application/json");
         String json = "";
-        if(request.getParameter("id")==null){
+        try {
+            if(request.getParameter("id")==null){
+                json = objectMapper.writeValueAsString(OrderDao.getAll());
+            }else{
+                objId = Integer.parseInt(request.getParameter("id"));
+                json = objectMapper.writeValueAsString(OrderDao.get(objId));
+            }
+            response.getOutputStream().print(json);
+        }catch (NullPointerException e){
+            response.setStatus(404);
+            response.getOutputStream().print("{Item not found}");
 
-
-            json = objectMapper.writeValueAsString(OrderDao.getAll());
-        }else{
-            objId = Integer.parseInt(request.getParameter("id"));
-            json = objectMapper.writeValueAsString(OrderDao.get(objId));
         }
-        response.getOutputStream().print(json);
     }
 
     @Override
@@ -48,15 +51,17 @@ public class OrderServlet extends CustomServlet{
         response.setHeader("Content-Type", "application/json");
         Order order = objectMapper.readValue(body,Order.class);
         if(order.getItemId()==null || order.getOrgId()==null || order.getInvoiceId()==null
-                || order.getCustomerName()==null|| order.getPrice()==null){
-
+                || order.getCustomerName()==null){
             response.setStatus(400);
-
             return;
         }
-        if(OrderDao.save(order)==1){
-            response.getOutputStream().print("Created Success Fully");
+        Order out = OrderDao.save(order);
+        if(out!=null){
+            int old = StockDao.getWithWarIdAndItemId(order.getWarId(),order.getItemId()).getCount();
+            StockDao.updateWithWarIdAndItemId(order.getWarId(),order.getItemId(),old-order.getQuantity());
+            response.getOutputStream().print(objectMapper.writeValueAsString(out));
         }else {
+            response.setStatus(400);
             response.getOutputStream().print("Creation Failed");
         }
     }
@@ -102,8 +107,9 @@ public class OrderServlet extends CustomServlet{
         }
 
         if(OrderDao.update(objId,object.getPrice(),object.getQuantity())==1){
-            response.getOutputStream().print("success");
+            response.getOutputStream().print(objectMapper.writeValueAsString(OrderDao.get(objId)));
         }else {
+            response.setStatus(400);
             response.getOutputStream().print("failed");
         }
     }

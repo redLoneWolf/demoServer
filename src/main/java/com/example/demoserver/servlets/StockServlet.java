@@ -28,15 +28,23 @@ public class StockServlet extends CustomServlet{
         response.setStatus(200);
         response.setHeader("Content-Type", "application/json");
         String json = "";
-        if(request.getParameter("id")==null){
+        try {
+            if(request.getParameter("id")!=null ){
+                objId = Integer.parseInt(request.getParameter("id"));
+                json = objectMapper.writeValueAsString(StockDao.get(objId));
+            }else if(request.getParameter("itemId")!=null){
+                objId = Integer.parseInt(request.getParameter("itemId"));
 
+                json = objectMapper.writeValueAsString(StockDao.getWithItemId(objId));
+            }else {
+                json = objectMapper.writeValueAsString(StockDao.getAll());
+            }
+            response.getOutputStream().print(json);
+        }catch (NullPointerException e){
+            response.setStatus(404);
+            response.getOutputStream().print("{Item not found}");
 
-            json = objectMapper.writeValueAsString(StockDao.getAll());
-        }else{
-            objId = Integer.parseInt(request.getParameter("id"));
-            json = objectMapper.writeValueAsString(StockDao.get(objId));
         }
-        response.getOutputStream().print(json);
     }
 
     @Override
@@ -50,9 +58,11 @@ public class StockServlet extends CustomServlet{
 
             return;
         }
-        if(StockDao.save(stock)==1){
-            response.getOutputStream().print("Created Success Fully");
+        Stock out =StockDao.save(stock);
+        if(out!=null){
+            response.getOutputStream().print(objectMapper.writeValueAsString(out));
         }else {
+            response.setStatus(400);
             response.getOutputStream().print("Creation Failed");
         }
     }
@@ -99,7 +109,7 @@ public class StockServlet extends CustomServlet{
 
         newCount = object.getCount();
         if(StockDao.update(objId,newCount)==1){
-            response.getOutputStream().print("success");
+            response.getOutputStream().print(objectMapper.writeValueAsString(StockDao.get(objId)));
         }else {
             response.getOutputStream().print("failed");
         }

@@ -35,15 +35,21 @@ public class OrganisationServlet extends CustomServlet {
         response.setStatus(200);
         response.setHeader("Content-Type", "application/json");
         String json = "";
-        if(request.getParameter("id")==null){
+        try {
+            if(request.getParameter("id")==null){
 
 
-            json = objectMapper.writeValueAsString(OrganisationDao.getAll());
-        }else{
-            objId = Integer.parseInt(request.getParameter("id"));
-            json = objectMapper.writeValueAsString(OrganisationDao.get(objId));
+                json = objectMapper.writeValueAsString(OrganisationDao.getAll());
+            }else{
+                objId = Integer.parseInt(request.getParameter("id"));
+                json = objectMapper.writeValueAsString(OrganisationDao.get(objId));
+            }
+            response.getOutputStream().print(json);
+        }catch (NullPointerException e){
+            response.setStatus(404);
+            response.getOutputStream().print("{Item not found}");
+
         }
-        response.getOutputStream().print(json);
     }
 
     @Override
@@ -52,8 +58,10 @@ public class OrganisationServlet extends CustomServlet {
         response.setStatus(200);
         response.setHeader("Content-Type", "application/json");
         Organisation organisation = objectMapper.readValue(body,Organisation.class);
-        if(OrganisationDao.save(organisation)==1){
-            response.getOutputStream().print("Created Success Fully");
+         Organisation organisation1 = OrganisationDao.save(organisation);
+        if(organisation1!=null){
+
+            response.getOutputStream().print(objectMapper.writeValueAsString(organisation1));
         }else {
             response.getOutputStream().print("Creation Failed");
         }
@@ -88,7 +96,7 @@ public class OrganisationServlet extends CustomServlet {
         }
 
         if(OrganisationDao.update(objId,name)==1){
-            response.getOutputStream().print("success");
+            response.getOutputStream().print(objectMapper.writeValueAsString(OrganisationDao.get(objId)));
         }else {
             response.getOutputStream().print("failed");
         }

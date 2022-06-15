@@ -29,15 +29,24 @@ public class ItemServlet extends CustomServlet {
         response.setStatus(200);
         response.setHeader("Content-Type", "application/json");
         String json = "";
+        try {
         if(request.getParameter("id")==null){
 
 
             json = objectMapper.writeValueAsString(ItemDao.getAll());
         }else{
             objId = Integer.parseInt(request.getParameter("id"));
-            json = objectMapper.writeValueAsString(ItemDao.getItem(objId));
+
+                json = objectMapper.writeValueAsString(ItemDao.getWithStocks(objId));
+
+
         }
-        response.getOutputStream().print(json);
+            response.getOutputStream().print(json);
+        }catch (NullPointerException e){
+            response.setStatus(404);
+            response.getOutputStream().print("{Item not found}");
+
+        }
     }
 
 
@@ -48,9 +57,11 @@ public class ItemServlet extends CustomServlet {
             response.setStatus(200);
             response.setHeader("Content-Type", "application/json");
             Item item = objectMapper.readValue(body,Item.class);
-            if(ItemDao.save(item)==1){
-                response.getOutputStream().print("Created Success Fully");
+            Item out = ItemDao.save(item);
+            if(out!= null){
+                response.getOutputStream().print(objectMapper.writeValueAsString(out));
             }else {
+                response.setStatus(400);
                 response.getOutputStream().print("Creation Failed");
             }
     }
@@ -80,8 +91,9 @@ public class ItemServlet extends CustomServlet {
 //            return;
 //        }
         if(ItemDao.update(objId,object.fields())==1){
-            response.getOutputStream().print("success");
+            response.getOutputStream().print(objectMapper.writeValueAsString(ItemDao.getItem(objId)));
         }else {
+            response.setStatus(400);
             response.getOutputStream().print("failed");
         }
 

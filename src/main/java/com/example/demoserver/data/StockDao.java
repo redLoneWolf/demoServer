@@ -2,27 +2,30 @@ package com.example.demoserver.data;
 
 import com.example.demoserver.Database;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StockDao {
-    static public int save(Stock stock) {
+    static public Stock save(Stock stock) {
         Connection connection= Database.getConnection();
         int status = 0;
+        Stock out = null;
 
         String query = "insert into warehouseStocks(warId, itemId, count) values ("+ stock.getWarId()+","+ stock.getItemId()+","+ stock.getCount()+");";
 
         try {
-            Statement st = connection.createStatement();
-            status = st.executeUpdate(query);
+            PreparedStatement pstmt = connection.prepareStatement(query);
+            status = pstmt.executeUpdate(query,Statement.RETURN_GENERATED_KEYS);
+            if(status==1){
+                ResultSet keys = pstmt.getGeneratedKeys();
+                keys.next();
+                out =  get(keys.getInt(1));
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return status;
+        return out;
     }
 
     static public List<Stock> getAll(){
@@ -61,6 +64,21 @@ public class StockDao {
         }
         return stock;
     }
+    static public Stock getWithWarIdAndItemId(int warId,int itemId){
+        Connection connection= Database.getConnection();
+        Stock stock = null;
+        String query = "select id, warId, itemId, count from warehouseStocks where itemId ="+itemId+" and warId="+warId+" limit  1;";
+        try {
+            Statement st = connection.createStatement();
+            ResultSet set = st.executeQuery(query);
+            while (set.next()) {
+                stock = new Stock(set.getInt("id"),set.getInt("warId"),set.getInt("itemId"),set.getInt("count"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return stock;
+    }
 
     static public int delete(int id){
         Connection connection= Database.getConnection();
@@ -88,5 +106,39 @@ public class StockDao {
         }
         return status;
     }
+
+    public static int updateWithWarIdAndItemId(int warId,int itemId, int count){
+        int status = 0;
+        Connection connection = Database.getConnection();
+        String query = "update warehouseStocks set count="+count+" where itemId="+itemId+" and warId="+warId+"  limit 1;";
+        System.out.println(query);
+        try {
+            Statement st = connection.createStatement();
+            status = st.executeUpdate(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return status;
+    }
+
+    public static List<Stock> getWithItemId(int itemId){
+        Connection connection = Database.getConnection();
+
+        List<Stock> stocks = new ArrayList<>();
+        String query = "select id, warId, itemId, count from warehouseStocks where itemId ="+itemId+" ;";
+        try {
+            Statement st = connection.createStatement();
+            ResultSet set = st.executeQuery(query);
+            while (set.next()) {
+
+                stocks.add(new Stock(set.getInt("id"),set.getInt("warId"),set.getInt("itemId"),set.getInt("count")));
+            }
+        }
+        catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        return stocks;
+    }
+
 
 }

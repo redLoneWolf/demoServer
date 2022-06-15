@@ -2,28 +2,31 @@ package com.example.demoserver.data;
 
 import com.example.demoserver.Database;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WarehouseDao {
 
-    static public int save(Warehouse warehouse) {
+    static public Warehouse save(Warehouse warehouse) {
         Connection connection= Database.getConnection();
+        Warehouse out = null;
         int status = 0;
 
         String query = "insert into warehouses(name, orgId) values ('"+warehouse.getName()+"',"+ warehouse.getOrgId()+");";
 
         try {
-            Statement st = connection.createStatement();
-            status = st.executeUpdate(query);
+            PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            status = pstmt.executeUpdate(query,Statement.RETURN_GENERATED_KEYS );
+            if(status==1){
+                ResultSet keys = pstmt.getGeneratedKeys();
+                keys.next();
+                out =  get(keys.getInt(1));
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return status;
+        return out;
     }
 
     static public List<Warehouse> getAll(){

@@ -2,6 +2,8 @@ package com.example.demoserver.data;
 
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +13,10 @@ public class Organisation {
     int id;
     String name;
     String createdAt;
-    List<Warehouse> warehouses = new ArrayList<>();
+
+
+    @JsonIgnore
+    List<Warehouse> warehouses;
 
     public Organisation(int id, String name, String createdAt) {
         this.id = id;

@@ -3,20 +3,26 @@ package com.example.demoserver.data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.List;
 
+@JsonPropertyOrder({"id","orgId","customerName","createdAt","discount","tax","totalPrice","withTaxDis","orders"})
 public class Invoice {
 
     private int id;
     private String customerName;
     private Integer orgId;
     private String createdAt;
-    private List<Order> orders;
     private Float discount;
     private Float tax;
 
-    @JsonIgnore
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<Order> orders;
+
+
     private Float totalPrice= (float) 0;
 
     public Invoice(int id, String customerName, int orgId, String createdAt, List<Order> orders, float discount, float tax) {
@@ -32,21 +38,31 @@ public class Invoice {
     public Invoice() {
     }
 
+
     public Float getTotalPrice() {
-        for (Order order:orders) {
-            totalPrice = totalPrice + order.getPrice();
-        }
         return totalPrice;
     }
 
+    public void setTotalPrice(Float totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
     public float applyTax(){
-        getTotalPrice();
+//        getTotalPrice();
         return  totalPrice+(totalPrice*tax)/100;
     }
 
     public float applyDiscount(){
-        getTotalPrice();
+//        getTotalPrice();
         return totalPrice-(totalPrice*discount)/100;
+    }
+
+    @JsonProperty("withTaxDis")
+    public float totalPriceWithTaxAndDiscount(){
+
+        float temp = totalPrice-(totalPrice*discount)/100;
+
+        return (temp+(temp*tax)/100);
     }
 
     public Float getDiscount() {
@@ -96,6 +112,7 @@ public class Invoice {
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
+
 
     public List<Order> getOrders() {
         return orders;
