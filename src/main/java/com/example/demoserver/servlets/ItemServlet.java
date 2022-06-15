@@ -1,28 +1,26 @@
 package com.example.demoserver.servlets;
 
-import com.example.demoserver.GsonHelper;
+import com.example.demoserver.JacksonHelper;
 import com.example.demoserver.data.Item;
 import com.example.demoserver.data.ItemDao;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.List;
 
 @WebServlet(name = "ItemServlet", value = "/items")
 public class ItemServlet extends CustomServlet {
 
-    Gson gson;
+    ObjectMapper objectMapper;
     @Override
     public void init() throws ServletException {
         super.init();
 
-        gson = GsonHelper.getGson();
+        objectMapper = JacksonHelper.getObjectMapper();
     }
 
     @Override
@@ -32,12 +30,12 @@ public class ItemServlet extends CustomServlet {
         response.setHeader("Content-Type", "application/json");
         String json = "";
         if(request.getParameter("id")==null){
-            Type listType = new TypeToken<List<Item>>() {}.getType();
 
-            json = gson.toJson(ItemDao.getAll(),listType);
+
+            json = objectMapper.writeValueAsString(ItemDao.getAll());
         }else{
             objId = Integer.parseInt(request.getParameter("id"));
-            json = gson.toJson(ItemDao.getItem(objId));
+            json = objectMapper.writeValueAsString(ItemDao.getItem(objId));
         }
         response.getOutputStream().print(json);
     }
@@ -49,7 +47,7 @@ public class ItemServlet extends CustomServlet {
             String body =  Utils.getBody(request);
             response.setStatus(200);
             response.setHeader("Content-Type", "application/json");
-            Item item = gson.fromJson(body,Item.class);
+            Item item = objectMapper.readValue(body,Item.class);
             if(ItemDao.save(item)==1){
                 response.getOutputStream().print("Created Success Fully");
             }else {
@@ -71,7 +69,7 @@ public class ItemServlet extends CustomServlet {
             return;
         }
 
-        JsonObject object =  gson.fromJson(body,JsonObject.class);
+        JsonNode object =  objectMapper.readTree(body);
 
 //        response.getOutputStream().print(object.toString());
 //        "name","desc","cost","sale"
@@ -81,7 +79,7 @@ public class ItemServlet extends CustomServlet {
 //
 //            return;
 //        }
-        if(ItemDao.update(objId,object.entrySet())==1){
+        if(ItemDao.update(objId,object.fields())==1){
             response.getOutputStream().print("success");
         }else {
             response.getOutputStream().print("failed");

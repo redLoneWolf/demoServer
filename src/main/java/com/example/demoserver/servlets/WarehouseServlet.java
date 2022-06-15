@@ -1,27 +1,25 @@
 package com.example.demoserver.servlets;
 
-import com.example.demoserver.GsonHelper;
+import com.example.demoserver.JacksonHelper;
 import com.example.demoserver.data.*;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.List;
 
 @WebServlet(name = "WarehouseServlet",value = "/warehouses")
 public class WarehouseServlet extends CustomServlet{
 
-    Gson gson;
+    ObjectMapper objectMapper;
     @Override
     public void init() throws ServletException {
         super.init();
 
-        gson = GsonHelper.getGson();
+        objectMapper = JacksonHelper.getObjectMapper();
     }
 
     @Override
@@ -31,12 +29,12 @@ public class WarehouseServlet extends CustomServlet{
         response.setHeader("Content-Type", "application/json");
         String json = "";
         if(request.getParameter("id")==null){
-            Type listType = new TypeToken<List<Warehouse>>() {}.getType();
 
-            json = gson.toJson(WarehouseDao.getAll(),listType);
+
+            json = objectMapper.writeValueAsString(WarehouseDao.getAll());
         }else{
             objId = Integer.parseInt(request.getParameter("id"));
-            json = gson.toJson(WarehouseDao.get(objId));
+            json = objectMapper.writeValueAsString(WarehouseDao.get(objId));
         }
         response.getOutputStream().print(json);
     }
@@ -46,7 +44,7 @@ public class WarehouseServlet extends CustomServlet{
         String body =  Utils.getBody(request);
         response.setStatus(200);
         response.setHeader("Content-Type", "application/json");
-        Warehouse war = gson.fromJson(body,Warehouse.class);
+        Warehouse war = objectMapper.readValue(body,Warehouse.class);
         if(war.getOrgId()<1){
 
             response.getOutputStream().print("Creation Failed");
@@ -72,7 +70,7 @@ public class WarehouseServlet extends CustomServlet{
             response.setStatus(400);
             return;
         }
-        Warehouse object =  gson.fromJson(body, Warehouse.class);
+        Warehouse object =  objectMapper.readValue(body, Warehouse.class);
         String name ;
         if(object.getName()!=null){
             name = object.getName();

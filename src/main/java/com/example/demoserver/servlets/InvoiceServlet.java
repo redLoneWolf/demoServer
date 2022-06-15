@@ -1,27 +1,25 @@
 package com.example.demoserver.servlets;
 
-import com.example.demoserver.GsonHelper;
+import com.example.demoserver.JacksonHelper;
 import com.example.demoserver.data.*;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.List;
 
 @WebServlet(name = "InvoiceServlet",value = "/invoices")
 public class InvoiceServlet extends CustomServlet{
 
-    Gson gson;
+    ObjectMapper objectMapper;
     @Override
     public void init() throws ServletException {
         super.init();
 
-        gson = GsonHelper.getGson();
+        objectMapper = JacksonHelper.getObjectMapper();
     }
 
     @Override
@@ -31,12 +29,12 @@ public class InvoiceServlet extends CustomServlet{
         response.setHeader("Content-Type", "application/json");
         String json = "";
         if(request.getParameter("id")==null){
-            Type listType = new TypeToken<List<Invoice>>() {}.getType();
 
-            json = gson.toJson(InvoiceDao.getAll(),listType);
+
+            json = objectMapper.writeValueAsString(InvoiceDao.getAll());
         }else{
             objId = Integer.parseInt(request.getParameter("id"));
-            json = gson.toJson(InvoiceDao.get(objId));
+            json = objectMapper.writeValueAsString(InvoiceDao.get(objId));
         }
         response.getOutputStream().print(json);
     }
@@ -46,7 +44,7 @@ public class InvoiceServlet extends CustomServlet{
         String body =  Utils.getBody(request);
         response.setStatus(200);
         response.setHeader("Content-Type", "application/json");
-        Invoice invoice = gson.fromJson(body,Invoice.class);
+        Invoice invoice = objectMapper.readValue(body, Invoice.class);
         if(invoice.getCustomerName()==null || invoice.getOrgId()==null){
             response.setStatus(400);
             return;
@@ -89,7 +87,7 @@ public class InvoiceServlet extends CustomServlet{
             response.setStatus(400);
             return;
         }
-        Invoice object =  gson.fromJson(body, Invoice.class);
+        Invoice object =  objectMapper.readValue(body, Invoice.class);
         System.out.println();
 
         if(object.getTax()==null&&object.getDiscount()==null){

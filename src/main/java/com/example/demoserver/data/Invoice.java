@@ -1,34 +1,23 @@
 package com.example.demoserver.data;
 
-import com.google.gson.annotations.SerializedName;
+
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.List;
 
 public class Invoice {
 
-    @SerializedName("id")
     private int id;
-
-    @SerializedName("cname")
     private String customerName;
-
-    @SerializedName("orgId")
     private Integer orgId;
-
-    @SerializedName("createdAt")
     private String createdAt;
-
-    @SerializedName("orders")
     private List<Order> orders;
-
-    @SerializedName("discount")
     private Float discount;
-
-    @SerializedName("tax")
     private Float tax;
 
+    @JsonIgnore
     private Float totalPrice= (float) 0;
-
 
     public Invoice(int id, String customerName, int orgId, String createdAt, List<Order> orders, float discount, float tax) {
         this.id = id;

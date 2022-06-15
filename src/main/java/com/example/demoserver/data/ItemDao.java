@@ -1,8 +1,8 @@
 package com.example.demoserver.data;
 
 import com.example.demoserver.Database;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
+import com.fasterxml.jackson.databind.JsonNode;
+
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -90,14 +90,16 @@ public class ItemDao {
 
     }
 
-    public static int update(int id,Set<Map.Entry<String, JsonElement>> entrySet){
+    public static int update(int id,Iterator<Map.Entry<String, JsonNode>> entrySet){
         int status =0;
         Connection connection = Database.getConnection();
         StringBuilder query = new StringBuilder("update items set ");
 
         int i =0;
-        for (Map.Entry<String, JsonElement> entry:entrySet){
+        for (; entrySet.hasNext(); ) {
+            Map.Entry<String, JsonNode> entry = entrySet.next();
             String key = entry.getKey();
+
             if(i>1 && i<4){
                 query.append(",");
             }
@@ -105,16 +107,16 @@ public class ItemDao {
             switch (key) {
 
                 case "name":
-                    query.append("name='").append(entry.getValue().getAsString()).append("'");i++;
+                    query.append("name='").append(entry.getValue().asText()).append("'");i++;
                     break;
                 case "desc":
-                    query.append("description='").append(entry.getValue().getAsString()).append("'");i++;
+                    query.append("description='").append(entry.getValue().asText()).append("'");i++;
                     break;
                 case "cost":
-                    query.append("costPrice=").append(entry.getValue().getAsString()).append(",");i++;
+                    query.append("costPrice=").append(entry.getValue().asInt()).append(",");i++;
                     break;
                 case "sale":
-                    query.append("sellingPrice=").append(entry.getValue().getAsString()).append(" ");i++;
+                    query.append("sellingPrice=").append(entry.getValue().asInt()).append(" ");i++;
                     break;
             }
             i++;

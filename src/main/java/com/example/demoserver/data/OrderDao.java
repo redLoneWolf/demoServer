@@ -9,7 +9,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class OrderDao {
     static public int save(Order order) {
         Connection connection= Database.getConnection();
@@ -112,5 +111,32 @@ public class OrderDao {
             throw new RuntimeException(e);
         }
         return status;
+    }
+
+
+    
+    static public List<Order> getAllWithInvoiceId(int invoiceId){
+        Connection connection= Database.getConnection();
+        List<Order> orders = new ArrayList<>();
+        String query = "select id, invoiceId, cName, itemId, orgId,quantity, price, createdAt from orders where invoiceId ="+invoiceId+" order by createdAt;";
+        try {
+            Statement st = connection.createStatement();
+            ResultSet set = st.executeQuery(query);
+            while (set.next()) {
+                Order order = new Order();
+                order.setId(set.getInt("id"));
+                order.setInvoiceId(set.getInt("invoiceId"));
+                order.setItemId(set.getInt("itemId"));
+                order.setCustomerName(set.getString("cName"));
+                order.setOrgId(set.getInt("orgId"));
+                order.setPrice(set.getInt("price"));
+                order.setQuantity(set.getInt("quantity"));
+                order.setCreatedAt(set.getTimestamp("createdAt").toString());
+                orders.add(order);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return orders;
     }
 }

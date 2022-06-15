@@ -1,28 +1,25 @@
 package com.example.demoserver.servlets;
 
-import com.example.demoserver.GsonHelper;
+import com.example.demoserver.JacksonHelper;
 import com.example.demoserver.data.Stock;
 import com.example.demoserver.data.StockDao;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.List;
 
 @WebServlet(name = "StockServlet",value ="/stocks")
 public class StockServlet extends CustomServlet{
 
-    Gson gson;
+    ObjectMapper objectMapper;
     @Override
     public void init() throws ServletException {
         super.init();
 
-        gson = GsonHelper.getGson();
+        objectMapper = JacksonHelper.getObjectMapper();
     }
 
     @Override
@@ -32,12 +29,12 @@ public class StockServlet extends CustomServlet{
         response.setHeader("Content-Type", "application/json");
         String json = "";
         if(request.getParameter("id")==null){
-            Type listType = new TypeToken<List<Stock>>() {}.getType();
 
-            json = gson.toJson(StockDao.getAll(),listType);
+
+            json = objectMapper.writeValueAsString(StockDao.getAll());
         }else{
             objId = Integer.parseInt(request.getParameter("id"));
-            json = gson.toJson(StockDao.get(objId));
+            json = objectMapper.writeValueAsString(StockDao.get(objId));
         }
         response.getOutputStream().print(json);
     }
@@ -47,7 +44,7 @@ public class StockServlet extends CustomServlet{
         String body =  Utils.getBody(request);
         response.setStatus(200);
         response.setHeader("Content-Type", "application/json");
-        Stock stock = gson.fromJson(body,Stock.class);
+        Stock stock = objectMapper.readValue(body,Stock.class);
         if(stock.getCount()==null){
             response.setStatus(400);
 
@@ -91,7 +88,7 @@ public class StockServlet extends CustomServlet{
             response.setStatus(400);
             return;
         }
-        Stock object =  gson.fromJson(body, Stock.class);
+        Stock object =  objectMapper.readValue(body, Stock.class);
         int  newCount ;
         System.out.println();
 

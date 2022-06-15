@@ -1,21 +1,16 @@
 package com.example.demoserver.data;
 
-import com.google.gson.annotations.SerializedName;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Organisation {
 
-    @SerializedName("id")
+
     int id;
-
-    @SerializedName("name")
     String name;
-
-    @SerializedName("createdAt")
     String createdAt;
-
     List<Warehouse> warehouses = new ArrayList<>();
 
     public Organisation(int id, String name, String createdAt) {

@@ -1,10 +1,10 @@
 package com.example.demoserver;
 
-import com.google.gson.annotations.SerializedName;
+
 
 public class User {
 
-    @SerializedName("id")
+
     int id;
 
     public int getId() {
@@ -15,7 +15,7 @@ public class User {
         this.id = id;
     }
 
-    @SerializedName("name")
+
     String name;
 
     public String getName() {
@@ -26,7 +26,6 @@ public class User {
         this.name = name;
     }
 
-    @SerializedName("email")
     String email;
 
     public String getEmail() {

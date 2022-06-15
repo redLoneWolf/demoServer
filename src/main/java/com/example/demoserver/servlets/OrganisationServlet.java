@@ -1,29 +1,32 @@
 package com.example.demoserver.servlets;
 
-import com.example.demoserver.GsonHelper;
+import com.example.demoserver.JacksonHelper;
 import com.example.demoserver.data.Organisation;
 import com.example.demoserver.data.OrganisationDao;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.List;
 
 @WebServlet(name = "OrganisationServlet", value = "/organisations")
 public class OrganisationServlet extends CustomServlet {
 
 
-    Gson gson;
+    ObjectMapper objectMapper;
     @Override
     public void init() throws ServletException {
         super.init();
 
-        gson = GsonHelper.getGson();
+
+
+        objectMapper = JacksonHelper.getObjectMapper();
+
     }
 
     @Override
@@ -33,12 +36,12 @@ public class OrganisationServlet extends CustomServlet {
         response.setHeader("Content-Type", "application/json");
         String json = "";
         if(request.getParameter("id")==null){
-            Type listType = new TypeToken<List<Organisation>>() {}.getType();
 
-            json = gson.toJson(OrganisationDao.getAll(),listType);
+
+            json = objectMapper.writeValueAsString(OrganisationDao.getAll());
         }else{
             objId = Integer.parseInt(request.getParameter("id"));
-            json = gson.toJson(OrganisationDao.get(objId));
+            json = objectMapper.writeValueAsString(OrganisationDao.get(objId));
         }
         response.getOutputStream().print(json);
     }
@@ -48,7 +51,7 @@ public class OrganisationServlet extends CustomServlet {
         String body =  Utils.getBody(request);
         response.setStatus(200);
         response.setHeader("Content-Type", "application/json");
-        Organisation organisation = gson.fromJson(body,Organisation.class);
+        Organisation organisation = objectMapper.readValue(body,Organisation.class);
         if(OrganisationDao.save(organisation)==1){
             response.getOutputStream().print("Created Success Fully");
         }else {
@@ -70,7 +73,7 @@ public class OrganisationServlet extends CustomServlet {
             return;
         }
 
-        Organisation object =  gson.fromJson(body, Organisation.class);
+        Organisation object = objectMapper.readValue(body, Organisation.class);
 //        String name ;
 
         String name ;

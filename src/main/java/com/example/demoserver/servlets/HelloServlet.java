@@ -2,13 +2,7 @@ package com.example.demoserver.servlets;
 
 import com.example.demoserver.Database;
 import com.example.demoserver.User;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import org.hibernate.Session;
-import org.hibernate.mapping.Set;
-import org.hibernate.query.Query;
+
 
 import java.io.*;
 import java.sql.*;
@@ -24,11 +18,11 @@ public class HelloServlet extends HttpServlet {
 
 
 
-    Gson gson;
+
     Connection conn;
     public void init() {
         message = "Hello World!";
-        gson = new Gson();
+
         conn = Database.getConnection();
 
     }
@@ -48,34 +42,34 @@ public class HelloServlet extends HttpServlet {
 //        out.println("<html><body>");
 //        out.println("<h1>" + message + "</h1>");
 
-
-        Statement st = null;
-        JsonArray jsonArray = new JsonArray();
-        try {
-            st = conn.createStatement();
-            ResultSet rs =  st.executeQuery("");
-
-            while (rs.next()){
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                String   email  = rs.getString ("email");
-//                out.print("<br>");
-//                JsonObject jsonObject = new JsonObject();
-                User user = new User(id,name,email);
-
-
-                jsonArray.add(gson.toJsonTree(user));
-
-//                out.println("<tr><td>"+name+"</td><td>"+email+"</td></tr>");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+//
+//        Statement st = null;
+//
+//        try {
+//            st = conn.createStatement();
+//            ResultSet rs =  st.executeQuery("");
+//
+//            while (rs.next()){
+//                int id = rs.getInt("id");
+//                String name = rs.getString("name");
+//                String   email  = rs.getString ("email");
+////                out.print("<br>");
+////                JsonObject jsonObject = new JsonObject();
+//                User user = new User(id,name,email);
+//
+//
+//                jsonArray.add(gson.toJsonTree(user));
+//
+////                out.println("<tr><td>"+name+"</td><td>"+email+"</td></tr>");
+//            }
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
 
 
         resp.setStatus(200);
         resp.setHeader("Content-Type", "application/json");
-        out.print(jsonArray.toString());
+//        out.print(jsonArray.toString());
 //        out.println("</body></html>");
        
         

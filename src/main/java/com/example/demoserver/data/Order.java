@@ -1,31 +1,17 @@
 package com.example.demoserver.data;
 
-import com.google.gson.annotations.SerializedName;
+
 
 public class Order {
 
-    @SerializedName("id")
+
     int id;
-
-    @SerializedName("invoiceId")
     Integer invoiceId;
-
-    @SerializedName("cname")
     String customerName;
-
-    @SerializedName("itemId")
     Integer itemId;
-
-    @SerializedName("orgId")
     Integer orgId;
-
-    @SerializedName("price")
     Integer price;
-
-    @SerializedName("quantity")
     Integer quantity;
-
-    @SerializedName("createdAt")
     String createdAt;
 
     public Order(int id, int invoiceId, String customerName, int itemId, int orgId, int price,Integer quantity, String createdAt) {

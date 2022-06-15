@@ -1,16 +1,16 @@
 package com.example.demoserver.data;
 
-import com.google.gson.annotations.SerializedName;
+
 
 public class Warehouse {
 
-    @SerializedName("id")
+
     int id;
 
-    @SerializedName("name")
+
     String name;
 
-    @SerializedName("orgId")
+
     int orgId;
 
     public Warehouse(int id, String name, int orgId) {

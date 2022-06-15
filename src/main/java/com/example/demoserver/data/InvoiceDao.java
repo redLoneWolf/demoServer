@@ -108,4 +108,12 @@ public class InvoiceDao {
         return status;
     }
 
+    public static Invoice getWithOrders(int id){
+        Invoice invoice = get(id);
+
+
+
+        return invoice;
+    }
+
 }

@@ -1,19 +1,18 @@
 package com.example.demoserver.data;
 
-import com.google.gson.annotations.SerializedName;
 
 public class Stock {
 
-    @SerializedName("id")
+
     int id;
 
-    @SerializedName("warId")
+
     int warId;
 
-    @SerializedName("itemId")
+
     int itemId;
 
-    @SerializedName("count")
+
     Integer count;
 
     public Stock(int id, int warId, int itemId, int count) {
