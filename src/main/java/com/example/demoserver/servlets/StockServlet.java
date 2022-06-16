@@ -31,6 +31,10 @@ public class StockServlet extends CustomServlet{
         try {
             if(request.getParameter("id")!=null ){
                 objId = Integer.parseInt(request.getParameter("id"));
+                Stock stock = StockDao.get(objId);
+                if(stock==null){
+                    throw new NullPointerException();
+                }
                 json = objectMapper.writeValueAsString(StockDao.get(objId));
             }else if(request.getParameter("itemId")!=null){
                 objId = Integer.parseInt(request.getParameter("itemId"));

@@ -42,7 +42,9 @@ public class OrganisationServlet extends CustomServlet {
                 json = objectMapper.writeValueAsString(OrganisationDao.getAll());
             }else{
                 objId = Integer.parseInt(request.getParameter("id"));
-                json = objectMapper.writeValueAsString(OrganisationDao.get(objId));
+                Organisation organisation = OrganisationDao.get(objId);
+                if(organisation==null){throw  new NullPointerException();}
+                json = objectMapper.writeValueAsString(organisation);
             }
             response.getOutputStream().print(json);
         }catch (NullPointerException e){

@@ -33,7 +33,9 @@ public class WarehouseServlet extends CustomServlet{
                 json = objectMapper.writeValueAsString(WarehouseDao.getAll());
             }else{
                 objId = Integer.parseInt(request.getParameter("id"));
-                json = objectMapper.writeValueAsString(WarehouseDao.get(objId));
+                Warehouse warehouse = WarehouseDao.get(objId);
+                if(warehouse==null){throw  new NullPointerException();}
+                json = objectMapper.writeValueAsString(warehouse);
             }
             response.getOutputStream().print(json);
         }catch (NullPointerException e){
