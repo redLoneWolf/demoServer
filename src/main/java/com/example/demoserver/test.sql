@@ -45,7 +45,6 @@ create table warehouseStocks(id int not null auto_increment primary key,
                              warId int not null,
                              itemId int not null,
                              count int not null default 0,
-
                              constraint war_fk
                                  foreign key (warId)
                                      references warehouses(id)
@@ -56,8 +55,12 @@ create table warehouseStocks(id int not null auto_increment primary key,
                                  foreign key (itemId)
                                      references items(id)
                                      on delete cascade
-                                     on update cascade
+                                     on update cascade,
+
+                            constraint unique_IW unique (itemId,warId)
+
 );
+
 
 create table orders(id int not null auto_increment primary key ,
                     invoiceId int not null ,
@@ -90,39 +93,58 @@ create table orders(id int not null auto_increment primary key ,
                             on update cascade
 );
 
+create table users(id int not null auto_increment primary key ,email varchar(255) unique not null check ( email!=''),password varchar(255) not null check ( password!='' ));
+
 
 #
-# insert into organisations(name) values ('TestOrganisation 1');
-# insert into organisations(name) values ('TestOrganisation 2');
+insert into organisations(name) values ('TestOrganisation 1');
+insert into organisations(name) values ('TestOrganisation 2');
+
+insert into warehouses(name, orgId) values ('Warehouse 1',1);
+insert into warehouses(name, orgId) values ('Warehouse 2',2);
 #
-# insert into warehouses(name, orgId) values ('Warehouse 1',1);
-# insert into warehouses(name, orgId) values ('Warehouse 2',2);
+insert into items(orgId, name, description,  costPrice, sellingPrice) values (1,'shoe','shoe from nike',400,500);
+insert into items(orgId, name, description,  costPrice, sellingPrice) values (1,'pen','pen from cello',10,15);
+insert into items(orgId, name, description,  costPrice, sellingPrice) values (1,'pencil','pencil from apsara',5,7);
+insert into items(orgId, name, description,  costPrice, sellingPrice) values (1,'eraser','eraser from apsara',3,5);
+insert into items(orgId, name, description,  costPrice, sellingPrice) values (1,'ruler','ruler from FC',15,20);
 #
-# insert into items(orgId, name, description,  costPrice, sellingPrice) values (1,'shoe','shoe from nike',400,500);
-# insert into items(orgId, name, description,  costPrice, sellingPrice) values (1,'pen','pen from cello',10,15);
-# insert into items(orgId, name, description,  costPrice, sellingPrice) values (1,'pencil','pencil from apsara',5,7);
-# insert into items(orgId, name, description,  costPrice, sellingPrice) values (1,'eraser','eraser from apsara',3,5);
-# insert into items(orgId, name, description,  costPrice, sellingPrice) values (1,'ruler','ruler from FC',15,20);
+# insert into warehouseStocks(warId, itemId, count) values (1,1,100);
+insert into warehouseStocks(warId, itemId, count) values (1,2,100);
+insert into warehouseStocks(warId, itemId, count) values (1,3,100);
+insert into warehouseStocks(warId, itemId, count) values (1,4,100);
+insert into warehouseStocks(warId, itemId, count) values (1,5,100);
+
 #
-# insert into warehouseStocks(warId, itemId, count) values (1,15,100);
-# insert into warehouseStocks(warId, itemId, count) values (1,16,100);
-# insert into warehouseStocks(warId, itemId, count) values (1,17,100);
-# insert into warehouseStocks(warId, itemId, count) values (1,18,100);
-# insert into warehouseStocks(warId, itemId, count) values (1,19,100);
-#
-#
-# insert into warehouseStocks(warId, itemId, count) values (5,15,200);
-# insert into warehouseStocks(warId, itemId, count) values (5,16,200);
-# insert into warehouseStocks(warId, itemId, count) values (5,17,200);
-# insert into warehouseStocks(warId, itemId, count) values (5,18,200);
-# insert into warehouseStocks(warId, itemId, count) values (5,19,200);
+insert into warehouseStocks(warId, itemId, count) values (5,15,200);
+insert into warehouseStocks(warId, itemId, count) values (5,16,200);
+insert into warehouseStocks(warId, itemId, count) values (5,17,200);
+insert into warehouseStocks(warId, itemId, count) values (5,18,200);
+insert into warehouseStocks(warId, itemId, count) values (5,19,200);
+
+select i.name, COALESCE(sum(o.quantity),0)  as totalSold,COALESCE(sum(wS.count),0) as stock  from items i left join inventoryDB.orders o on o.itemId = i.id
+    left join warehouseStocks wS on wS.itemId = i.id group by i.id;
+
+select dte, sum(quantity) as qt, sum(ie.count) as stock
+from ((select orders.itemId as dte, quantity, 0 as count
+       from orders
+      ) union all
+      (select itemId, 0, count
+       from warehouseStocks
+      )
+     ) ie
+group by dte
+order by stock  ;
+
+
+
 #
 # insert into invoices( cName, orgId, discount, tax ) values ('sudhar',1,5.1,4.1);
-# insert into invoices( cName, orgId, discount, tax ) values ('sudhar',3,5.2,4.2);
+# insert into invoices( cName, orgId, discount, tax ) values ('sudhar',1,5.2,4.2);
 # insert into invoices( cName, orgId, discount, tax ) values ('sudhar',1,5.3,4.3);
-# insert into invoices( cName, orgId, discount, tax ) values ('sudhar',3,5.4,4.4);
+# insert into invoices( cName, orgId, discount, tax ) values ('sudhar',1,5.4,4.4);
 # insert into invoices( cName, orgId, discount, tax ) values ('sudhar',1,5.5,4.5);
-#
+
 # insert into orders( invoiceId, cName, itemId, orgId,quantity, price,stockId ) values (1,'sudhar',15,1,5,500,2);
 # insert into orders( invoiceId, cName, itemId, orgId,quantity, price ,stockId) values (1,'sudhar',16,1,3,15,1);
 # insert into orders( invoiceId, cName, itemId, orgId,quantity, price ,stockId) values (1,'sudhar',17,1,4,7,1);

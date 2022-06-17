@@ -1,6 +1,7 @@
 package com.example.demoserver.servlets;
 
 import com.example.demoserver.JacksonHelper;
+import com.example.demoserver.data.ReportsDao;
 import com.example.demoserver.data.Stock;
 import com.example.demoserver.data.StockDao;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,6 +11,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 @WebServlet(name = "StockServlet",value ="/stocks")
 public class StockServlet extends CustomServlet{
@@ -62,7 +65,16 @@ public class StockServlet extends CustomServlet{
 
             return;
         }
-        Stock out =StockDao.save(stock);
+        Stock out = null;
+        try {
+             out =StockDao.save(stock);
+        }catch (SQLIntegrityConstraintViolationException e){
+                response.getOutputStream().print("{data already exists}");
+                return;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
         if(out!=null){
             response.getOutputStream().print(objectMapper.writeValueAsString(out));
         }else {

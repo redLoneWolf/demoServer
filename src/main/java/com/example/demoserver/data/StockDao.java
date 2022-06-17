@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StockDao {
-    static public Stock save(Stock stock) {
+    static public Stock save(Stock stock) throws SQLException {
         Connection connection= Database.getConnection();
         int status = 0;
         Stock out = null;
 
         String query = "insert into warehouseStocks(warId, itemId, count) values ("+ stock.getWarId()+","+ stock.getItemId()+","+ stock.getCount()+");";
 
-        try {
+//        try {
             PreparedStatement pstmt = connection.prepareStatement(query);
             status = pstmt.executeUpdate(query,Statement.RETURN_GENERATED_KEYS);
             if(status==1){
@@ -22,9 +22,9 @@ public class StockDao {
                 keys.next();
                 out =  get(keys.getInt(1));
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+//        } catch (SQLException e ) {
+//            throw new RuntimeException(e);
+//        }
         return out;
     }
 
@@ -57,7 +57,7 @@ public class StockDao {
             Statement st = connection.createStatement();
             ResultSet set = st.executeQuery(query);
             while (set.next()) {
-                stock = new Stock(set.getInt("id"),set.getInt("warId"),set.getInt("itemId"),set.getInt("count"));
+                stock = new Stock(set.getInt("id"),set.getInt("warId"),set.getInt("itemId"),set.getInt("count"),0);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -72,7 +72,7 @@ public class StockDao {
             Statement st = connection.createStatement();
             ResultSet set = st.executeQuery(query);
             while (set.next()) {
-                stock = new Stock(set.getInt("id"),set.getInt("warId"),set.getInt("itemId"),set.getInt("count"));
+                stock = new Stock(set.getInt("id"),set.getInt("warId"),set.getInt("itemId"),set.getInt("count"),0);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -131,7 +131,7 @@ public class StockDao {
             ResultSet set = st.executeQuery(query);
             while (set.next()) {
 
-                stocks.add(new Stock(set.getInt("id"),set.getInt("warId"),set.getInt("itemId"),set.getInt("count")));
+                stocks.add(new Stock(set.getInt("id"),set.getInt("warId"),set.getInt("itemId"),set.getInt("count"),0));
             }
         }
         catch (SQLException e) {

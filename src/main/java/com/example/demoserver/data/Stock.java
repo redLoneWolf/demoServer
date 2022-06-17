@@ -15,7 +15,9 @@ public class Stock {
 
     Integer count;
 
-    public Stock(int id, int warId, int itemId, int count) {
+    Integer quantitySold;
+
+    public Stock(int id, int warId, int itemId, Integer count,Integer quantitySold) {
         this.id = id;
         this.warId = warId;
         this.itemId = itemId;
@@ -55,5 +57,13 @@ public class Stock {
 
     public void  setCount(Integer count) {
         this.count = count;
+    }
+
+    public Integer getQuantitySold() {
+        return quantitySold;
+    }
+
+    public void setQuantitySold(Integer quantitySold) {
+        this.quantitySold = quantitySold;
     }
 }

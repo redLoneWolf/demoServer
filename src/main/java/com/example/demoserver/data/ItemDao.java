@@ -147,4 +147,6 @@ public class ItemDao {
         item.setTotalStock(stocks.stream().mapToInt(Stock::getCount).reduce(0,Integer::sum));
         return item;
     }
+
+
 }

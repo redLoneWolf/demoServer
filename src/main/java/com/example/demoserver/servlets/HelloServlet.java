@@ -1,12 +1,10 @@
 package com.example.demoserver.servlets;
 
 import com.example.demoserver.Database;
-import com.example.demoserver.User;
 
 
 import java.io.*;
 import java.sql.*;
-import java.util.Arrays;
 
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
