@@ -95,7 +95,6 @@ create table orders(id int not null auto_increment primary key ,
 
 create table users(id int not null auto_increment primary key ,email varchar(255) unique not null check ( email!=''),password varchar(255) not null check ( password!='' ));
 
-
 #
 insert into organisations(name) values ('TestOrganisation 1');
 insert into organisations(name) values ('TestOrganisation 2');
@@ -135,6 +134,22 @@ from ((select orders.itemId as dte, quantity, 0 as count
      ) ie
 group by dte
 order by stock  ;
+
+
+select i.cName, COALESCE(sum(o.quantity*o.price),0)  as totalSoldPrice ,count(i.id) as soldUnits,count(i.cName)   from orders o left join inventoryDB.invoices i on i.cName = o.cName group by cName;
+
+select i.cName, @totalPrice= COALESCE(sum(o.quantity*o.price),0)  as totalSoldPrice  ,@temp= @totalPrice-(@totalPrice*i.discount)/100, @temp+(@temp*i.tax)/100 as withtax from orders o left join inventoryDB.invoices i on i.cName = o.cName group by cName;
+
+
+select  i.cName from(select invoiceId,sum(quantity*price) as totalPrice from orders ) o left join invoices i on i.id=o.invoiceId group by i.cName;
+
+
+select dte, sum(tot) as totaPricePaid, sum(ie.ct) as invoices
+from ((select  orders.cName as dte, price*orders.quantity as tot, 0 as ct
+       from orders
+      ) union all
+      (select invoices.cName,0, 1 from invoices )) ie group by dte;
+
 
 
 

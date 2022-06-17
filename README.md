@@ -178,3 +178,53 @@ response
     ]
 }
 ```
+#
+```/reports/items``` report for items options eg.```?sortBy=soldUnits```
+
+available options : ```soldUnits,stockUnits,itemPrice,totalSaleAmount```
+
+sample ```/reports/items?sortBy=-totalSaleAmount```
+```json 
+[
+    {
+        "createdAt": 1655448707000,
+        "sellingPrice": 500,
+        "totalSaleAmount": 25000,
+        "item_id": 1,
+        "name": "shoe",
+        "stockUnits": 250,
+        "soldUnits": 50
+    },
+    {
+        "createdAt": 1655448707000,
+        "sellingPrice": 15,
+        "totalSaleAmount": 150,
+        "item_id": 2,
+        "name": "pen",
+        "stockUnits": 100,
+        "soldUnits": 10
+    },
+ ]
+ ```
+
+#
+```/reports/customer``` report for customer options eg.```?sortBy=cname```
+
+available options : ```cname,totalPrice,invoices```
+
+sample ```/reports/items?sortBy=totalPrice```
+```json 
+[
+    {
+        "invoices": 1,
+        "totalPrice": 4000,
+        "cname": "zack"
+    },
+    {
+        "invoices": 5,
+        "totalPrice": 16100,
+        "cname": "sudhar"
+    }
+]
+ ```
+

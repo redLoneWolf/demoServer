@@ -12,20 +12,32 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Map;
 
-@WebServlet(name = "ReportServlet",value = "/reports")
+@WebServlet(name = "ReportServlet",urlPatterns = {"/reports/items","/reports/customer"})
 public class ReportServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String,String[]> map = req.getParameterMap();
-
         resp.setHeader("Content-Type", "application/json");
+
+        String uri = req.getRequestURI().substring(req.getRequestURI().lastIndexOf("/")+1,req.getRequestURI().length());
+
+
 
         System.out.println(map);
         String json ="";
 
         try {
-            json = ReportsDao.getItemReports(req.getParameterMap());
+            switch (uri){
+                case "items":
+                    json = ReportsDao.getItemReports(req.getParameterMap());
+                    break;
+                case "customer":
+                    json = ReportsDao.getCustomerReports(req.getParameterMap());
+                    break;
+                default:
+                    json = "{ invalid }";
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
