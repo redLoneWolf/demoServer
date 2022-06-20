@@ -11,8 +11,28 @@ create table warehouses(id int not null auto_increment primary key,
         foreign key (orgId) references organisations(id) on delete cascade  on update cascade
 );
 
+
+
+create table groupItems(id int not null auto_increment primary key, name varchar(255) unique not null check ( name!=''),createdAt timestamp not null default CURRENT_TIMESTAMP,orgId int not null,
+                constraint orgG_FK
+                foreign key (orgId)
+                references organisations(id)
+                on delete NO ACTION
+                on update no action
+                       );
+
+# create table attributes(id int not null auto_increment primary key ,groupId int not null ,
+#     attr varchar(255),value varchar(255),
+#                         constraint grpA_fk
+#                             foreign key (groupId)
+#                             references groupItems(id)
+#                             on delete NO ACTION
+#                             on update no action
+#                        );
+
 create table items(id int not null auto_increment primary key,
                    orgId int not null,
+                   groupId int,
                    name varchar(255) not null check ( name!=''),
                    description varchar(255),
                    createdAt timestamp not null default CURRENT_TIMESTAMP,
@@ -24,7 +44,12 @@ create table items(id int not null auto_increment primary key,
                        foreign key(orgId)
                            references organisations(id)
                            on delete cascade
-                           on update cascade
+                           on update cascade,
+                    constraint grp_fk
+                        foreign key (groupId)
+                            references groupItems(id)
+                                on delete NO ACTION
+                                on update no action
 
 );
 
@@ -93,7 +118,9 @@ create table orders(id int not null auto_increment primary key ,
                             on update cascade
 );
 
-create table users(id int not null auto_increment primary key ,email varchar(255) unique not null check ( email!=''),password varchar(255) not null check ( password!='' ));
+
+
+create table users(id int not null auto_increment primary key, email varchar(255) unique not null check ( email!=''),password varchar(255) not null check ( password!=''));
 
 #
 insert into organisations(name) values ('TestOrganisation 1');
@@ -151,6 +178,7 @@ from ((select  orders.cName as dte, price*orders.quantity as tot, 0 as ct
       (select invoices.cName,0, 1 from invoices )) ie group by dte;
 
 
+# insert into
 
 
 #

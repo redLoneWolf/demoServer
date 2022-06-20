@@ -37,7 +37,7 @@ public class ItemServlet extends CustomServlet {
         }else{
             objId = Integer.parseInt(request.getParameter("id"));
 
-                json = objectMapper.writeValueAsString(ItemDao.getWithStocks(objId));
+                json = objectMapper.writeValueAsString(ItemDao.getItem(objId));
 
 
         }
@@ -48,8 +48,6 @@ public class ItemServlet extends CustomServlet {
 
         }
     }
-
-
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -96,8 +94,6 @@ public class ItemServlet extends CustomServlet {
             response.setStatus(400);
             response.getOutputStream().print("failed");
         }
-
-
     }
 
 

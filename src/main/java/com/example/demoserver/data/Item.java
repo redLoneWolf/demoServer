@@ -19,6 +19,10 @@ public class Item{
     int totalStock;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    Integer groupId;
+
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     List<Stock>stocks;
 
     public Item() {
@@ -34,6 +38,13 @@ public class Item{
         this.createdAt = createdAt;
     }
 
+    public Integer getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Integer groupId) {
+        this.groupId = groupId;
+    }
 
     public List<Stock> getStocks() {
         return stocks;

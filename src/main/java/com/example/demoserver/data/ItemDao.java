@@ -14,10 +14,30 @@ public class ItemDao {
        int status = 0;
        Item out = null;
        Connection connection = Database.getConnection();
-
+       String query  = "insert into items(orgId, name, description,costPrice, sellingPrice) values ("+ item.getOrgId()+",'" +
+                   item.getName()+"','"+item.getDescription()+"',"+item.getCostPrice()+","+item.getSellingPrice()+");";
         try {
-            String query = "insert into items(orgId, name, description,  costPrice, sellingPrice) values ("+ item.getOrgId()+",'" +
-                    item.getName()+"','"+item.getDescription()+"',"+item.getCostPrice()+","+item.getSellingPrice()+");";
+            PreparedStatement pstmt = connection.prepareStatement(query);
+            status = pstmt.executeUpdate(query,Statement.RETURN_GENERATED_KEYS);
+            if(status==1){
+                ResultSet keys = pstmt.getGeneratedKeys();
+                keys.next();
+                out =  getItem(keys.getInt(1));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return out;
+
+    };
+
+    public static Item saveWithGroup(Item item){
+        int status = 0;
+        Item out = null;
+        Connection connection = Database.getConnection();
+        String query = "insert into items(orgId, name, description,costPrice, sellingPrice,groupId) values ("+ item.getOrgId()+",'" +
+                item.getName()+"','"+item.getDescription()+"',"+item.getCostPrice()+","+item.getSellingPrice()+","+item.getGroupId()+");";
+        try {
             PreparedStatement pstmt = connection.prepareStatement(query);
             status = pstmt.executeUpdate(query,Statement.RETURN_GENERATED_KEYS);
             if(status==1){
@@ -29,6 +49,9 @@ public class ItemDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+
+
         return out;
 
     };
@@ -38,7 +61,7 @@ public class ItemDao {
         List<Item>items = new ArrayList<>();
         try {
             Statement st =  connection.createStatement();
-            String query = "select id,orgId,name,description,costPrice,sellingPrice,createdAt from items;";
+            String query = "select id,orgId,name,description,costPrice,sellingPrice,createdAt,groupId from items;";
             ResultSet rs =  st.executeQuery(query);
             while (rs.next()){
                 Item item = new Item();
@@ -46,6 +69,7 @@ public class ItemDao {
                 item.setName(rs.getString("name"));
                 item.setDescription(rs.getString("description"));
                 item.setOrgId(rs.getInt("orgId"));
+                item.setGroupId(rs.getInt("groupId"));
                 item.setCostPrice(rs.getInt("costPrice"));
                 item.setSellingPrice(rs.getInt("sellingPrice"));
                 item.setCreatedAt(rs.getTimestamp("createdAt").toString());
@@ -63,7 +87,7 @@ public class ItemDao {
         Connection connection = Database.getConnection();
         try {
             Statement st =  connection.createStatement();
-            String query = "select id,orgId,name,description,costPrice,sellingPrice,createdAt from items where id="+id+" limit  1;";
+            String query = "select id,orgId,name,description,costPrice,sellingPrice,createdAt,groupId from items where id="+id+" limit  1;";
             ResultSet rs =  st.executeQuery(query);
             while (rs.next()){
                 item = new Item();
@@ -71,6 +95,7 @@ public class ItemDao {
                 item.setName(rs.getString("name"));
                 item.setDescription(rs.getString("description"));
                 item.setOrgId(rs.getInt("orgId"));
+                item.setGroupId(rs.getInt("groupId"));
                 item.setCostPrice(rs.getInt("costPrice"));
                 item.setSellingPrice(rs.getInt("sellingPrice"));
                 item.setCreatedAt(rs.getTimestamp("createdAt").toString());
@@ -78,8 +103,38 @@ public class ItemDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+       if(item!=null){
+           List<Stock>stocks = StockDao.getWithItemId(item.getId());
+           item.setStocks(stocks);
+       }
         return item;
     }
+    public static List<Item> getAllWithGroupId(int groupId){
+        Connection connection = Database.getConnection();
+        List<Item>items = new ArrayList<>();
+        try {
+            Statement st =  connection.createStatement();
+            String query = "select id,orgId,name,description,costPrice,sellingPrice,createdAt,groupId from items where groupId="+groupId+";";
+            ResultSet rs =  st.executeQuery(query);
+            while (rs.next()){
+                Item item = new Item();
+                item.setId(rs.getInt("id"));
+                item.setName(rs.getString("name"));
+                item.setGroupId(rs.getInt("groupId"));
+                item.setDescription(rs.getString("description"));
+                item.setOrgId(rs.getInt("orgId"));
+                item.setCostPrice(rs.getInt("costPrice"));
+                item.setSellingPrice(rs.getInt("sellingPrice"));
+                item.setCreatedAt(rs.getTimestamp("createdAt").toString());
+                item.setTotalStock(StockDao.getWithItemId(item.getId()).stream().mapToInt(Stock::getCount).reduce(0, Integer::sum));
+                items.add(item);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return items;
+    }
+
     public static int delete(int id){
         int status=0;
         Connection connection = Database.getConnection();
@@ -94,6 +149,19 @@ public class ItemDao {
 
     }
 
+    public static int deleteWithGroupId(int id){
+        int status=0;
+        Connection connection = Database.getConnection();
+        String query = "delete from items where groupId="+id+" ;";
+        try {
+            Statement st = connection.createStatement();
+            status = st.executeUpdate(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return status;
+
+    }
     public static int update(int id,Iterator<Map.Entry<String, JsonNode>> entrySet){
         int status =0;
         Connection connection = Database.getConnection();
