@@ -228,3 +228,78 @@ sample ```/reports/items?sortBy=totalPrice```
 ]
  ```
 
+```/groups``` create delete item groups
+
+POST request
+
+```json lines
+{
+    "orgId": 1,
+    "name": "Pens",
+    "items":[
+        {
+          "name":"Red Pen",
+           "costPrice": 11,
+            "sellingPrice":20
+        },{
+          "name":"Blue Pen",
+           "costPrice": 12,
+            "sellingPrice":20
+        },
+        {
+          "name":"Green Pen",
+           "costPrice": 13,
+            "sellingPrice":20
+        }
+    ]
+}
+```
+
+response 
+
+```json lines
+{
+    "id": 3,
+    "name": "Pens",
+    "orgId": 1,
+    "items": [
+        {
+            "id": 8,
+            "name": "Red Pen",
+            "description": "null",
+            "costPrice": 11,
+            "sellingPrice": 20,
+            "orgId": 1,
+            "createdAt": "2022-06-20 14:03:00.0",
+            "totalStock": 0,
+            "groupId": 3,
+            "stocks": []
+        },
+        {
+            "id": 9,
+            "name": "Blue Pen",
+            "description": "null",
+            "costPrice": 12,
+            "sellingPrice": 20,
+            "orgId": 1,
+            "createdAt": "2022-06-20 14:03:00.0",
+            "totalStock": 0,
+            "groupId": 3,
+            "stocks": []
+        },
+        {
+            "id": 10,
+            "name": "Green Pen",
+            "description": "null",
+            "costPrice": 13,
+            "sellingPrice": 20,
+            "orgId": 1,
+            "createdAt": "2022-06-20 14:03:00.0",
+            "totalStock": 0,
+            "groupId": 3,
+            "stocks": []
+        }
+    ]
+}
+```
+
